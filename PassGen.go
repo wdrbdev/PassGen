@@ -112,6 +112,7 @@ var (
 	hasLowAlpha *bool
 	hasDigit    *bool
 	hasChar     *bool
+	unsimilar   *bool
 	unique      *bool
 	length      *int
 )
@@ -123,6 +124,7 @@ func init() {
 	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters")
 	hasDigit = flag.Bool("digit", false, "Include digits")
 	hasChar = flag.Bool("char", false, "Include special characters")
+	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI)")
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
 	length = flag.Int("length", 16, "Length of password generated")
 }
@@ -153,6 +155,9 @@ func main() {
 		if *hasChar {
 			dictMarker.Char(dictionary)
 		}
+	}
+	if *unsimilar {
+		dictMarker.Unsimilar(dictionary)
 	}
 
 	var chars []string
