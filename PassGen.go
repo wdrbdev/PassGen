@@ -140,6 +140,7 @@ func main() {
 	}
 
 	if *length <= 0 {
+		// TODO use log.fatal instead of panic
 		panic("length must be positive integer")
 	}
 
@@ -172,6 +173,7 @@ func main() {
 		chars = append(chars, char)
 	}
 	if *unique && len(chars) < *length {
+		// TODO use log.fatal instead of panic
 		panic("Available characters is less than chosen length.")
 	}
 
@@ -184,6 +186,7 @@ func main() {
 	}
 
 	// generate password
+	// TODO generate n password concurrently
 	var password = generate(chars, *length)
 	fmt.Println(password)
 }
