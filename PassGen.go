@@ -125,7 +125,7 @@ func main() {
 	}
 
 	var generate func([]string, int) string
-	generate = generator.Shuffle
+	generate = generator.RandIdxDeduplicate
 	var password = generate(chars, 16)
 	fmt.Println(password)
 }
