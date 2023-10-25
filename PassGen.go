@@ -1,8 +1,10 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
+	"github.com/PassGen/dictMarker"
 	"github.com/PassGen/generator"
 )
 
@@ -103,17 +105,44 @@ var dictionary = map[string]bool{
 	"~":  false,
 }
 
-var lowAlpha = []string{}
-var upAlpha = []string{}
-var numbers = []string{}
-var specialChars = []string{}
+var (
+	hasUpAlpha  *bool
+	hasLowAlpha *bool
+	hasDigit    *bool
+	hasChar     *bool
+)
+
+func init() {
+	hasUpAlpha = flag.Bool("upper", false, "Include upper case letters")
+	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters")
+	hasDigit = flag.Bool("digit", false, "Include digits")
+	hasChar = flag.Bool("char", false, "Include special characters")
+}
 
 func main() {
 	// TODO takes command line arguments
-
+	flag.Parse()
 	// TODO to be removed
-	for char := range dictionary {
-		dictionary[char] = true
+	fmt.Println("Include upper case letters", *hasUpAlpha)
+	fmt.Println("Include lower case letters", *hasLowAlpha)
+	fmt.Println("Include digits", *hasDigit)
+	fmt.Println("Include special characters", *hasChar)
+
+	if !*hasUpAlpha && !*hasLowAlpha && !*hasDigit && !*hasChar {
+		dictMarker.Alphanumeric(dictionary)
+	} else {
+		if *hasUpAlpha {
+			dictMarker.Upper(dictionary)
+		}
+		if *hasLowAlpha {
+			dictMarker.Lower(dictionary)
+		}
+		if *hasDigit {
+			dictMarker.Digit(dictionary)
+		}
+		if *hasChar {
+			dictMarker.Char(dictionary)
+		}
 	}
 
 	var chars []string
