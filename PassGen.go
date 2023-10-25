@@ -124,7 +124,7 @@ func init() {
 	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters")
 	hasDigit = flag.Bool("digit", false, "Include digits")
 	hasChar = flag.Bool("char", false, "Include special characters")
-	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI)")
+	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI...)")
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
 	length = flag.Int("length", 16, "Length of password generated")
 }
@@ -137,6 +137,10 @@ func main() {
 		fmt.Println("# --- Usage of", fileName, "--- #")
 		flag.PrintDefaults()
 		return
+	}
+
+	if *length <= 0 {
+		panic("length must be positive integer")
 	}
 
 	// Select user-chosen characters according to flag
@@ -177,9 +181,6 @@ func main() {
 		generate = generator.RandIdx
 	} else {
 		generate = generator.RandIdxDeduplicate
-	}
-	if *length <= 0 {
-		panic("length must be positive integer")
 	}
 
 	// generate password
