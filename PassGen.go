@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"runtime"
 
 	"github.com/PassGen/dictMarker"
 	"github.com/PassGen/generator"
@@ -106,28 +107,37 @@ var dictionary = map[string]bool{
 }
 
 var (
+	printUsage  bool
 	hasUpAlpha  *bool
 	hasLowAlpha *bool
 	hasDigit    *bool
 	hasChar     *bool
+	unique      *bool
+	length      *int
 )
 
 func init() {
+	flag.BoolVar(&printUsage, "help", false, "Print usage")
+	flag.BoolVar(&printUsage, "h", false, "Print usage (shorthand)")
 	hasUpAlpha = flag.Bool("upper", false, "Include upper case letters")
 	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters")
 	hasDigit = flag.Bool("digit", false, "Include digits")
 	hasChar = flag.Bool("char", false, "Include special characters")
+	unique = flag.Bool("unique", false, "Exclude duplicate characters")
+	length = flag.Int("length", 16, "Length of password generated")
 }
 
 func main() {
-	// TODO takes command line arguments
 	flag.Parse()
-	// TODO to be removed
-	fmt.Println("Include upper case letters", *hasUpAlpha)
-	fmt.Println("Include lower case letters", *hasLowAlpha)
-	fmt.Println("Include digits", *hasDigit)
-	fmt.Println("Include special characters", *hasChar)
 
+	if printUsage {
+		_, fileName, _, _ := runtime.Caller(0)
+		fmt.Println("# --- Usage of", fileName, "--- #")
+		flag.PrintDefaults()
+		return
+	}
+
+	// Select user-chosen characters according to flag
 	if !*hasUpAlpha && !*hasLowAlpha && !*hasDigit && !*hasChar {
 		dictMarker.Alphanumeric(dictionary)
 	} else {
@@ -152,9 +162,22 @@ func main() {
 		}
 		chars = append(chars, char)
 	}
+	if *unique && len(chars) < *length {
+		panic("Available characters is less than chosen length.")
+	}
 
+	// Select generator algorithm according to flag
 	var generate func([]string, int) string
-	generate = generator.RandIdxDeduplicate
-	var password = generate(chars, 16)
+	if !*unique {
+		generate = generator.RandIdx
+	} else {
+		generate = generator.RandIdxDeduplicate
+	}
+	if *length <= 0 {
+		panic("length must be positive integer")
+	}
+
+	// generate password
+	var password = generate(chars, *length)
 	fmt.Println(password)
 }
