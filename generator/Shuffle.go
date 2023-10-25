@@ -17,8 +17,6 @@ func Shuffle(chars []string, length int) string {
 func shuffleArray[T any](array []T) {
 	for i := 0; i < len(array); i++ {
 		randIdx := rand.Intn(len(array))
-		temp := array[i]
-		array[i] = array[randIdx]
-		array[randIdx] = temp
+		array[i], array[randIdx] = array[randIdx], array[i]
 	}
 }

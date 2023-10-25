@@ -103,7 +103,15 @@ var dictionary = map[string]bool{
 	"~":  false,
 }
 
+var lowAlpha = []string{}
+var upAlpha = []string{}
+var numbers = []string{}
+var specialChars = []string{}
+
 func main() {
+	// TODO takes command line arguments
+
+	// TODO to be removed
 	for char := range dictionary {
 		dictionary[char] = true
 	}
