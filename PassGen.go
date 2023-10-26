@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
 	"runtime"
 
@@ -120,6 +121,7 @@ var (
 	unsimilar     *bool
 	unique        *bool
 	length        *int
+	delimiter     *string
 )
 
 func init() {
@@ -137,6 +139,7 @@ func init() {
 	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI...)")
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
 	length = flag.Int("length", 16, "Length of password generated")
+	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated")
 }
 
 func main() {
@@ -198,8 +201,10 @@ func main() {
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
 		// TODO add output type: stdout or file
-		// TODO add delimiter type: any
 		// TODO count generation time
-		fmt.Println(password)
+		if i != passwordCount-1 {
+			fmt.Fprint(os.Stdout, password)
+			fmt.Fprint(os.Stdout, *delimiter)
+		}
 	}
 }
