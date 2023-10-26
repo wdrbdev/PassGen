@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -202,9 +203,11 @@ func main() {
 		password := <-passwordChan
 		// TODO add output type: stdout or file
 		// TODO count generation time
+		var writer io.Writer
+		writer = os.Stdout
+		fmt.Fprint(writer, password)
 		if i != passwordCount-1 {
-			fmt.Fprint(os.Stdout, password)
-			fmt.Fprint(os.Stdout, *delimiter)
+			fmt.Fprint(writer, *delimiter)
 		}
 	}
 }
