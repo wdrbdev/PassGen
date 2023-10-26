@@ -1,9 +1,9 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -123,6 +123,7 @@ var (
 	unique        *bool
 	length        *int
 	delimiter     *string
+	output        *string
 )
 
 func init() {
@@ -139,14 +140,16 @@ func init() {
 	hasChar = flag.Bool("char", false, "Include special characters")
 	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI...)")
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
-	length = flag.Int("length", 16, "Length of password generated")
-	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated")
+	length = flag.Int("length", 16, "Length of password generated. Default is 16.")
+	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated. Default is `\n`.")
+	output = flag.String("output", "", "The file path as output destination. Default is stdout.")
 }
 
 func main() {
 	flag.Parse()
 
 	if printUsage {
+		fmt.Println("["+fileName+"]:", "Generate random passwords offline.")
 		fmt.Println("# --- Usage of", fileName, "--- #")
 		flag.PrintDefaults()
 		return
@@ -157,21 +160,20 @@ func main() {
 	}
 
 	// Select user-chosen characters according to flag
+	if *hasUpAlpha {
+		dictMarker.Upper(dictionary)
+	}
+	if *hasLowAlpha {
+		dictMarker.Lower(dictionary)
+	}
+	if *hasDigit {
+		dictMarker.Digit(dictionary)
+	}
+	if *hasChar {
+		dictMarker.Char(dictionary)
+	}
 	if !*hasUpAlpha && !*hasLowAlpha && !*hasDigit && !*hasChar {
 		dictMarker.Alphanumeric(dictionary)
-	} else {
-		if *hasUpAlpha {
-			dictMarker.Upper(dictionary)
-		}
-		if *hasLowAlpha {
-			dictMarker.Lower(dictionary)
-		}
-		if *hasDigit {
-			dictMarker.Digit(dictionary)
-		}
-		if *hasChar {
-			dictMarker.Char(dictionary)
-		}
 	}
 	if *unsimilar {
 		dictMarker.Unsimilar(dictionary)
@@ -196,15 +198,28 @@ func main() {
 		generate = generator.RandIdxDeduplicate
 	}
 
+	// select output destination
+	var writer = os.Stdout
+	if *output != "" {
+		var err error
+		if _, err := os.Stat(*output); err == nil {
+			log.Fatal("[", fileName, "] ", "file `", *output, "` already existed or ", err)
+		} else if !errors.Is(err, os.ErrNotExist) {
+			log.Fatal("[", fileName, "] ", err)
+		}
+
+		writer, err = os.Create(*output)
+		if err != nil {
+			log.Fatal("[", fileName, "] ", err)
+		}
+	}
+
 	// generate password
 	passwordChan := make(chan string, passwordCount)
 	concurrent.FanIn(generate, chars, *length, passwordCount, passwordChan)
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
-		// TODO add output type: stdout or file
 		// TODO count generation time
-		var writer io.Writer
-		writer = os.Stdout
 		fmt.Fprint(writer, password)
 		if i != passwordCount-1 {
 			fmt.Fprint(writer, *delimiter)
