@@ -212,6 +212,7 @@ func main() {
 		if err != nil {
 			log.Fatal("[", fileName, "] ", err)
 		}
+		defer writer.Close()
 	}
 
 	// generate password
