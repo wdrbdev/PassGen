@@ -194,9 +194,12 @@ func main() {
 
 	// generate password
 	passwordChan := make(chan string, passwordCount)
-	concurrent.Generator(generate, chars, *length, passwordCount, passwordChan)
+	concurrent.FanIn(generate, chars, *length, passwordCount, passwordChan)
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
+		// TODO add output type: stdout or file
+		// TODO add delimiter type: any
+		// TODO count generation time
 		fmt.Println(password)
 	}
 }
