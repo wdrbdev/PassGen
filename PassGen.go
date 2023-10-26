@@ -3,8 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
+	"path/filepath"
 	"runtime"
 
+	"github.com/PassGen/concurrent"
 	"github.com/PassGen/dictMarker"
 	"github.com/PassGen/generator"
 )
@@ -107,19 +110,26 @@ var dictionary = map[string]bool{
 }
 
 var (
-	printUsage  bool
-	hasUpAlpha  *bool
-	hasLowAlpha *bool
-	hasDigit    *bool
-	hasChar     *bool
-	unsimilar   *bool
-	unique      *bool
-	length      *int
+	fileName      string
+	printUsage    bool
+	passwordCount int
+	hasUpAlpha    *bool
+	hasLowAlpha   *bool
+	hasDigit      *bool
+	hasChar       *bool
+	unsimilar     *bool
+	unique        *bool
+	length        *int
 )
 
 func init() {
+	_, fileName, _, _ = runtime.Caller(0)
+	fileName = filepath.Base(fileName)
+
 	flag.BoolVar(&printUsage, "help", false, "Print usage")
 	flag.BoolVar(&printUsage, "h", false, "Print usage (shorthand)")
+	flag.IntVar(&passwordCount, "number", 1, "Total count of passwords generated")
+	flag.IntVar(&passwordCount, "n", 1, "Total count of passwords generated (shorthand)")
 	hasUpAlpha = flag.Bool("upper", false, "Include upper case letters")
 	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters")
 	hasDigit = flag.Bool("digit", false, "Include digits")
@@ -133,15 +143,13 @@ func main() {
 	flag.Parse()
 
 	if printUsage {
-		_, fileName, _, _ := runtime.Caller(0)
 		fmt.Println("# --- Usage of", fileName, "--- #")
 		flag.PrintDefaults()
 		return
 	}
 
 	if *length <= 0 {
-		// TODO use log.fatal instead of panic
-		panic("length must be positive integer")
+		log.Fatal("[", fileName, "] ", "length must be positive integer")
 	}
 
 	// Select user-chosen characters according to flag
@@ -173,8 +181,7 @@ func main() {
 		chars = append(chars, char)
 	}
 	if *unique && len(chars) < *length {
-		// TODO use log.fatal instead of panic
-		panic("Available characters is less than chosen length.")
+		log.Fatal("[", fileName, "] ", "Available characters is less than chosen length.")
 	}
 
 	// Select generator algorithm according to flag
@@ -186,7 +193,10 @@ func main() {
 	}
 
 	// generate password
-	// TODO generate n password concurrently
-	var password = generate(chars, *length)
-	fmt.Println(password)
+	passwordChan := make(chan string, passwordCount)
+	concurrent.Generator(generate, chars, *length, passwordCount, passwordChan)
+	for i := 0; i < passwordCount; i++ {
+		password := <-passwordChan
+		fmt.Println(password)
+	}
 }
