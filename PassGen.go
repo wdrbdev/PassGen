@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"time"
 
 	"github.com/PassGen/concurrent"
 	"github.com/PassGen/dictMarker"
@@ -217,13 +218,14 @@ func main() {
 
 	// generate password
 	passwordChan := make(chan string, passwordCount)
+	start := time.Now()
 	concurrent.FanIn(generate, chars, *length, passwordCount, passwordChan)
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
-		// TODO count generation time
 		fmt.Fprint(writer, password)
 		if i != passwordCount-1 {
 			fmt.Fprint(writer, *delimiter)
 		}
 	}
+	fmt.Printf("\nIt took %v to generate %v passwords.\n", time.Since(start), passwordCount)
 }
