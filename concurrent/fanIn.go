@@ -4,16 +4,15 @@ import (
 	"runtime"
 )
 
-func FanIn(generate func([]string, int) string, chars []string, length int, resultCount int, resultChan chan<- string) {
+func FanIn(generate func([]string, int) string, chars []string, length int, resultChan chan<- string, stopChan <-chan bool) {
 	cpuCount := runtime.GOMAXPROCS(0)
 	for i := 0; i < cpuCount; i++ {
 		go func() {
 			select {
-			case resultChan <- generate(chars, length):
-				// nothing to do
-			default:
-				// resultChan full means generation of # of password given is completed
+			case <-stopChan:
 				return
+			case resultChan <- generate(chars, length):
+				// do nothing, keep generating until stopped
 			}
 		}()
 	}

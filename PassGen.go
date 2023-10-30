@@ -218,8 +218,10 @@ func main() {
 
 	// generate password
 	passwordChan := make(chan string, passwordCount)
+	stopChan := make(chan bool)
 	start := time.Now()
-	concurrent.FanIn(generate, chars, *length, passwordCount, passwordChan)
+	// concurrent.Generator(generate, chars, *length, passwordChan, stopChan)
+	concurrent.FanIn(generate, chars, *length, passwordChan, stopChan)
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
 		fmt.Fprint(writer, password)
@@ -227,5 +229,6 @@ func main() {
 			fmt.Fprint(writer, *delimiter)
 		}
 	}
+	stopChan <- true
 	fmt.Printf("\nIt took %v to generate %v passwords.\n", time.Since(start), passwordCount)
 }

@@ -1,11 +1,16 @@
 package concurrent
 
-func Generator(generate func([]string, int) string, chars []string, length int, resultCount int, resultChan chan<- string) {
-	generatorChan := make(chan string, resultCount)
+func Generator(generate func([]string, int) string, chars []string, length int, resultChan chan<- string, stopChan <-chan bool) {
+	generatorChan := make(chan string, 16)
 	go func() {
-		defer close(generatorChan)
-		for i := 0; i < resultCount; i++ {
-			generatorChan <- generate(chars, length)
+		for {
+			select {
+			case <-stopChan:
+				close(generatorChan)
+			case generatorChan <- generate(chars, length):
+				// do nothing, keep generating until stopped
+			}
+
 		}
 	}()
 
