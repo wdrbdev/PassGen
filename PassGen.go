@@ -157,7 +157,7 @@ func main() {
 	}
 
 	if *length <= 0 {
-		log.Fatal("[", fileName, "] ", "length must be positive integer")
+		log.Fatal("[", fileName, "] ", "length must be non-zero positive integer")
 	}
 
 	// Select user-chosen characters according to flag
