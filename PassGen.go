@@ -133,16 +133,16 @@ func init() {
 
 	flag.BoolVar(&printUsage, "help", false, "Print usage")
 	flag.BoolVar(&printUsage, "h", false, "Print usage (shorthand)")
-	flag.IntVar(&passwordCount, "number", 1, "Total count of passwords generated. Default is 1.")
-	flag.IntVar(&passwordCount, "n", 1, "Total count of passwords generated.(shorthand) Default is 1.")
+	flag.IntVar(&passwordCount, "number", 1, "Total count of passwords generated.")
+	flag.IntVar(&passwordCount, "n", 1, "Total count of passwords generated.(shorthand)")
 	hasUpAlpha = flag.Bool("upper", false, "Include upper case letters (A-Z)")
 	hasLowAlpha = flag.Bool("lower", false, "Include lower case letters (a-z)")
 	hasDigit = flag.Bool("digit", false, "Include digits (123...)")
 	hasChar = flag.Bool("char", false, "Include special characters (#@!...)")
 	unsimilar = flag.Bool("unsimilar", false, "Exclude similar characters (0oO1lI...)")
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
-	length = flag.Int("length", 16, "Length of password generated. Default is 16.")
-	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated. Default is `\n`.")
+	length = flag.Int("length", 16, "Length of password generated.")
+	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated.")
 	output = flag.String("output", "", "The file path as output destination. Default is stdout.")
 
 	flag.Parse()
@@ -150,7 +150,7 @@ func init() {
 
 func main() {
 	if printUsage {
-		fmt.Println("["+fileName+"]:", "Generate random passwords offline.")
+		fmt.Println("["+fileName+"]:", "An secure offline random password generator.")
 		fmt.Println("# --- Usage of", fileName, "--- #")
 		flag.PrintDefaults()
 		return
