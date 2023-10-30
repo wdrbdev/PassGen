@@ -216,7 +216,7 @@ func main() {
 		defer writer.Close()
 	}
 
-	// generate password
+	// generate password concurrently
 	passwordChan := make(chan string, 16)
 	stopChan := make(chan bool)
 	start := time.Now()
