@@ -144,11 +144,11 @@ func init() {
 	length = flag.Int("length", 16, "Length of password generated. Default is 16.")
 	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated. Default is `\n`.")
 	output = flag.String("output", "", "The file path as output destination. Default is stdout.")
+
+	flag.Parse()
 }
 
 func main() {
-	flag.Parse()
-
 	if printUsage {
 		fmt.Println("["+fileName+"]:", "Generate random passwords offline.")
 		fmt.Println("# --- Usage of", fileName, "--- #")
