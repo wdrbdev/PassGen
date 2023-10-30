@@ -10,17 +10,20 @@ func FanIn(generate func([]string, int) string, chars []string, length int, resu
 	for i := 0; i < cpuCount; i++ {
 		stopChans = append(stopChans, make(chan bool))
 		go func(stopChan <-chan bool) {
-			select {
-			case <-stopChan:
-				return
-			case resultChan <- generate(chars, length):
-				// do nothing, keep generating until stopped
+			for {
+				select {
+				case <-stopChan:
+					return
+				case resultChan <- generate(chars, length):
+					// do nothing, keep generating until stopped
+				}
 			}
 		}(stopChans[i])
 	}
 
 	go func() {
 		<-stopChan
+		// fan-out stop signal
 		for i := 0; i < cpuCount; i++ {
 			stopChans[i] <- true
 		}

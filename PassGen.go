@@ -220,8 +220,8 @@ func main() {
 	passwordChan := make(chan string, 16)
 	stopChan := make(chan bool)
 	start := time.Now()
-	concurrent.Generator(generate, chars, *length, passwordChan, stopChan)
-	// concurrent.FanIn(generate, chars, *length, passwordChan, stopChan)
+	// concurrent.Generator(generate, chars, *length, passwordChan, stopChan)
+	concurrent.FanIn(generate, chars, *length, passwordChan, stopChan)
 	// concurrent.WorkerPool(generate, chars, *length, passwordChan, stopChan)
 	for i := 0; i < passwordCount; i++ {
 		password := <-passwordChan
