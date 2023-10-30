@@ -7,6 +7,7 @@ func Generator(generate func([]string, int) string, chars []string, length int, 
 			select {
 			case <-stopChan:
 				close(generatorChan)
+				return
 			case generatorChan <- generate(chars, length):
 				// do nothing, keep generating until stopped
 			}
