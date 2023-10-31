@@ -143,7 +143,7 @@ func init() {
 	unique = flag.Bool("unique", false, "Exclude duplicate characters")
 	length = flag.Int("length", 16, "Length of password generated.")
 	delimiter = flag.String("delimiter", "\n", "Delimiter of passwords generated.")
-	output = flag.String("output", "", "The file path as output destination. Default is stdout.")
+	output = flag.String("output", "", "The file path as output destination. The default outputs to stdout.")
 
 	flag.Parse()
 }
